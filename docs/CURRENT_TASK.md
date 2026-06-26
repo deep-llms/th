@@ -1,71 +1,121 @@
-# Current Task — last updated 2026-06-20
+# Current Task — last updated 2026-06-26
 
 > The in-progress / foreground work. Read `PROJECT_NOTES.md` first for background, then this for "where exactly are we." When a task finishes, distill its conclusion into the PROJECT_NOTES timeline and clear this file for the next task.
 
 ## Goal
 
-Build a **cleaner version of Probe 2** whose per-language "frequent word" lists contain only words the model **actually saw by a given S3 checkpoint step** (1500 / 3250 / 5500 / 6500), instead of full-corpus frequencies. This makes the cross-lingual anchor-overlap measurement faithful to what the model had actually been trained on at each checkpoint. Serves the from-scratch Probe 2 story in PROJECT_NOTES.
+Train S3 alpha variants (alpha=0.2, 0.3, 0.5, 1.0) to test whether stronger hub coupling improves cross-lingual alignment. Previous experiments at alpha=0.05 showed the hub's effect was marginal compared to baseline.
 
 ## Status — where we are RIGHT NOW
 
-**Blocked by machine loss (again).** The training machine was lost, taking with it the S3 checkpoints, the dumped token IDs, and the decoded text. **All runtime state is gone; the analysis code is intact in git and verified.** So we are rebuilding from the start of the pipeline: re-download data → re-train S3 (with token-id dump) → re-decode → re-count → Probe 2.
+**Setting up new 8x H200 machine.** Data download in progress on the new EC2 instance. Next: train alpha variants + baseline, run Probe 2 Test B, compare.
 
-## Pipeline + commands (run in order on the rebuilt training machine)
+## What was completed (previous task, 2026-06-20 → 2026-06-26)
 
-Env names below (`embeddings_hub`, `fasttext_env`) must match the conda envs on the machine. Paths assume the default smoke output base `/opt/dlami/nvme/smoke_tests`; set once:
+The per-step Probe 2 pipeline was rebuilt from scratch and extended significantly. Full results in `docs/EXPERIMENT_RESULTS.md`.
+
+### Completed steps:
+
+1. **Data download + sampling** on 4x A100 machine. Sharded output to avoid OOM (`prepare_data.py` updated with `--flush-every`). ✓
+2. **Trained S3** (alpha=0.05) to step 6500 with token-id dump. ✓
+3. **Decoded token IDs → text → per-step word counts** (steps 1500/3250/5500/6500). ✓
+4. **Probe 2 with MUSE translations** — ran Test A (anchor weight overlap) + added **Test B** (post-hub embedding cosine similarity at alpha=0.0/0.05/0.1/0.2/0.3). ✓
+5. **Built LLM translation pipeline** (`build_translations_llm.py`) using GPT-4o — 4,804 tuples, much higher quality than MUSE (handles multi-word Vietnamese, no truncation). ✓
+6. **Probe 2 with LLM translations** — all-words + single-token-only variants. ✓
+7. **Trained baseline** (no EmbHub, identical hyperparameters) to step 6500. ✓
+8. **Baseline comparison** — ran Probe 2 Test B on baseline checkpoints. ✓
+
+### Key findings:
+
+- **Test B gap grows with training** (step 1500→6500): +0.013 → +0.057 on single-token words at alpha=0.05. Highly significant.
+- **BUT baseline shows nearly identical growth**: +0.011 → +0.055. The cross-lingual structure comes from the base model, not the hub.
+- **Hub's marginal contribution**: ~0.002 above baseline on single-token, within noise on all-words.
+- **Gap declines with alpha > 0.05**: expected since model trained at alpha=0.05 only.
+- **Single-token measurement is 3-4x cleaner** than all-words (mean-pooling dilutes signal).
+- **LLM translations strictly better than MUSE** for this measurement.
+
+### Interpretation / open question:
+
+Alpha=0.05 is very small — the hub barely perturbs the embedding. Higher alpha during TRAINING (not just at test time) could force the model to rely more on the hub for cross-lingual alignment. This is the motivation for the alpha-variant experiments.
+
+## Current pipeline — new machine (8x H200, CUDA 13.0)
+
+### Machine setup:
+- Envs: `embeddings_hub` (cu130), `fasttext_env` — installed via `scripts/setup_env.sh`
+- Data: `/opt/dlami/nvme/embhub_data/Qwen_Qwen3-0.6B/{train,eval}`
+- Checkpoints: `/opt/dlami/nvme/smoke_test_outputs/{S3,baseline,S3_a02,...}`
+
+### Step 0 — Data (in progress):
 ```bash
-TID=/opt/dlami/nvme/smoke_tests/S3/token_ids   # ids dumps + decoded text + per-step word counts
-CKPT=/opt/dlami/nvme/smoke_tests/S3            # checkpoint-1500, -3250, -5500, -6500
+# In commands.sh — downloading now
+python prepare_data.py download sample \
+    --tokenizer-name Qwen/Qwen3-0.6B --num-workers 4 \
+    --raw-dir /opt/dlami/nvme/embhub_data/raw \
+    --data-dir /opt/dlami/nvme/embhub_data
 ```
 
-**0. Data** — env `embeddings_hub`, one-time, ~175 GB (run in tmux/nohup):
+### Step 1 — Train alpha variants + baseline:
 ```bash
-python prepare_data.py download sample --tokenizer-name Qwen/Qwen3-0.6B --num-workers 4
+# Alpha variants (sequential, all 8 GPUs each)
+python run_smoke_tests.py --arms S3 S3_a02 S3_a03 S3_a05 S3_a10 --save-token-ids --stop-at-step 6500
+
+# Baseline (separate, no smoke CSV so can't use run_smoke_tests.py)
+bash scripts/train_qwen3_0.6b_baseline.sh
+# Kill after checkpoint-6500 appears
 ```
 
-**1. Train S3 + dump token IDs** — env `embeddings_hub`, 8 GPUs:
+### Step 2 — Decode + count words (for each arm):
 ```bash
-python run_smoke_tests.py --arms S3 --save-token-ids --stop-at-step 6500
+# For S3 and each alpha variant
+python diagnostics/decode_token_ids.py --input-dir /opt/dlami/nvme/smoke_test_outputs/S3/token_ids
+python diagnostics/count_words_from_text.py \
+    --input-dir /opt/dlami/nvme/smoke_test_outputs/S3/token_ids \
+    --steps 1500 3250 5500 6500 --min-count 5 --workers 160
 ```
-Produces `$CKPT/checkpoint-{1500,3250,5500,6500}` (save_steps=250) and `$TID/ids_rank{0..7}.jsonl` + `meta.json` = the exact training sequences in order (`rank = local_process_index`; 64 seq/step/rank → line *i* in a rank file belongs to step `i // 64`).
 
-**2. Decode IDs → text** — env `embeddings_hub`:
+### Step 3 — Build LLM translations:
 ```bash
-python diagnostics/decode_token_ids.py --input-dir $TID
+python diagnostics/build_translations_llm.py \
+    --freq-files /opt/dlami/nvme/smoke_test_outputs/S3/token_ids/frequent_words_step*.json \
+    --output temp/frequent_translations_llm.json \
+    --provider openai
 ```
-Writes `$TID/text_rank{N}.jsonl`, same line order. ⚠️ Committed version is SINGLE-PROCESS (slow); the ~3× faster multiprocessing.Pool version is NOT in git (see Decisions).
 
-**3. Language-ID + per-step word counts** — env `fasttext_env`:
+### Step 4 — Run Probe 2 on all arms:
 ```bash
-python diagnostics/count_words_from_text.py --input-dir $TID --steps 1500 3250 5500 6500 --min-count 5 --workers 64
-```
-Writes `$TID/frequent_words_step{N}.json` (cumulative). Sanity check: at step 1500, `en` should be ~95% of sequences — if not, the decode/order is wrong, stop and debug.
-
-**4–5. Per step: build MUSE pairs → run Probe 2** — env `embeddings_hub` (step 5 needs a GPU). Each step uses ITS OWN word list and the matching checkpoint:
-```bash
+# For each arm (S3, S3_a02, S3_a03, S3_a05, S3_a10, baseline)
 for S in 1500 3250 5500 6500; do
-  python diagnostics/build_frequent_translations.py \
-    --freq-file $TID/frequent_words_step${S}.json \
-    --output temp/frequent_translations_step${S}.json
   python diagnostics/anchor_probe2_muse_no_loan_word.py \
-    --checkpoints $CKPT/checkpoint-${S} \
-    --translations temp/frequent_translations_step${S}.json \
-    --output temp/probe2_step${S}_RESULTS.md
+    --checkpoints /opt/dlami/nvme/smoke_test_outputs/{arm}/checkpoint-${S} \
+    --translations temp/frequent_translations_llm.json \
+    --single-token-only \
+    --output temp/probe2_{arm}_single_step${S}_RESULTS.md
 done
 ```
-Then compare the JS-gap to the prior full-corpus Probe 2 v3 numbers recorded in PROJECT_NOTES (+0.0041 / +0.0042 / +0.0038 at 1500/3250/5500). The old `temp/probe2_muse_*` files were lost with the machine — compare against those documented numbers, not files.
+
+### What to look for in results:
+
+Compare Test B gap at alpha=0.0 across arms. If higher-alpha training produces a larger gap than baseline, the hub IS learning cross-lingual alignment — it just needed stronger coupling.
+
+| Arm | Training alpha | Expected gap vs baseline |
+|-----|---------------|------------------------|
+| baseline | N/A | reference |
+| S3 | 0.05 | ~same as baseline (confirmed) |
+| S3_a02 | 0.20 | ? |
+| S3_a03 | 0.30 | ? |
+| S3_a05 | 0.50 | ? |
+| S3_a10 | 1.00 | ? |
 
 ## Decisions already made (don't re-litigate)
 
-- **Decode is parallelized with `multiprocessing.Pool`, NOT `datasets.map`.** Benchmarked: `datasets.map` is ~3× *slower* here (Arrow cache I/O + fork-storm on 2048-int rows; it even drops below single-process past ~8 procs). ⚠️ **But the Pool version is NOT in git** — the committed `decode_token_ids.py` is the slower single-process one. Re-implement the Pool version (or accept single-process) before the next decode.
-- **Decode and count are two scripts in two envs by design** — fasttext runs under multiprocessing, and importing transformers in the same process tree risks a fork-after-threads deadlock. Keep them separate.
-- Inside fasttext workers: plain per-text `predict` (well-tested API), each worker loads its own model. Not batch-predict.
-
-## Where we are in the pipeline
-
-At **step 0** (re-downloading data after the machine loss). Run steps 0 → 5 above in order; nothing downstream exists yet. Update this line as steps complete.
+- **LLM translations over MUSE.** GPT-4o produces strictly better translations. MUSE is single-word only with ~60% untranslated Vietnamese.
+- **Single-token-only is the primary metric.** All-words mean-pooling dilutes signal; multi-token effects show after transformer layers, not at embedding level.
+- **Decode and count are two scripts in two envs by design** — fasttext multiprocessing + transformers = deadlock risk.
+- **Test B is the key measurement.** Test A (anchor weight overlap) is alpha-independent and shows weak signal.
 
 ## Dead ends (don't repeat)
 
 - `datasets.map` for the decode step — ~3× slower for this workload.
 - fasttext batch-predict — API safety under multiprocessing was uncertain; use per-text predict.
+- MUSE dictionaries — truncated Vietnamese, wrong translations, ~60% untranslated. Use LLM translations.
+- Alpha=0.05 from-scratch with no baseline comparison — can't distinguish hub effect from base model learning.
