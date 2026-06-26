@@ -1,3 +1,3 @@
-#2
+#1
 #download-and-sample
--0
+python -c \"import torch; print(torch.cuda.is_available(), torch.cuda.device_count(), torch.version.cuda)\"
