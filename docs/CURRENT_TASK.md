@@ -25,6 +25,18 @@ The per-step Probe 2 pipeline was rebuilt from scratch and extended significantl
 7. **Trained baseline** (no EmbHub, identical hyperparameters) to step 6500. ✓
 8. **Baseline comparison** — ran Probe 2 Test B on baseline checkpoints. ✓
 
+### Code changes made:
+
+- `prepare_data.py`: sharded output (`--flush-every`, default=1) to avoid OOM on limited-RAM machines. No early `os.makedirs` (crash recovery safe). `HF_TOKEN` from env var.
+- `train.py` + `smoke_train.py`: shard-aware data loading (detects `shard_*` subdirs, loads each, concatenates). Backward-compatible with old single-dir layout.
+- `run_smoke_tests.py`: added S3 alpha variants (`S3_a01` through `S3_a10`). Config updated for current machine.
+- `anchor_probe2_muse_no_loan_word.py`: added Test B (post-hub embedding cosine at multiple alphas), `--baseline` flag (loads model without EmbHub, Test B at alpha=0.0 only), `--single-token-only` filter.
+- `diagnostics/build_translations_llm.py`: NEW — replaces MUSE with LLM-generated translations. Supports Gemini/OpenAI, batched, resumable, deduplicates across multiple freq files.
+- `scripts/setup_env.sh`: NEW — installs miniconda + both conda envs non-interactively.
+- `scripts/train_qwen3_0.6b.sh` + `baseline.sh`: updated for 8x H200 (batch=16, grad_accum=4, 160 workers, nvme paths).
+- `commands.sh`: EC2 remote runner entry point — the new machine pulls the repo and runs this file.
+- `docs/EXPERIMENT_RESULTS.md`: NEW — full results with all numbers from MUSE/LLM/single-token/baseline runs.
+
 ### Key findings:
 
 - **Test B gap grows with training** (step 1500→6500): +0.013 → +0.057 on single-token words at alpha=0.05. Highly significant.
@@ -37,6 +49,8 @@ The per-step Probe 2 pipeline was rebuilt from scratch and extended significantl
 ### Interpretation / open question:
 
 Alpha=0.05 is very small — the hub barely perturbs the embedding. Higher alpha during TRAINING (not just at test time) could force the model to rely more on the hub for cross-lingual alignment. This is the motivation for the alpha-variant experiments.
+
+**Note:** The earlier short smoke tests (S9/S10, ~1000 steps) found alpha=0.20 measurably hurt LM loss (~4.3 vs ~3.9). S9=S3_a01 (alpha=0.10) and S10=S3_a02 (alpha=0.20) are identical configs. The higher LM loss is actually a **positive signal** — it means the hub is significantly changing the embeddings, unlike alpha=0.05 where the hub contributed nothing (identical loss to baseline). The question is whether that stronger perturbation also improves cross-lingual alignment (Test B gap). A slightly worse LM loss with a larger cross-lingual gap would be the desired trade-off.
 
 ## Current pipeline — new machine (8x H200, CUDA 13.0)
 
@@ -100,7 +114,8 @@ Compare Test B gap at alpha=0.0 across arms. If higher-alpha training produces a
 | Arm | Training alpha | Expected gap vs baseline |
 |-----|---------------|------------------------|
 | baseline | N/A | reference |
-| S3 | 0.05 | ~same as baseline (confirmed) |
+| S3 | 0.05 | ~same as baseline (confirmed on 4x A100) |
+| S3_a01 | 0.10 | ? (same config as S9, available but not prioritized) |
 | S3_a02 | 0.20 | ? |
 | S3_a03 | 0.30 | ? |
 | S3_a05 | 0.50 | ? |

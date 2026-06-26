@@ -37,6 +37,7 @@ ARM_CONFIGS = {
     # S3 alpha variants (same as S3 but with different alpha)
     "S3_a01":  {"scale_no_wd": True, "scale_lr_mult": 75, "scale_init": 14, "fixed_scale": False, "alpha": 0.10},
     "S3_a02":  {"scale_no_wd": True, "scale_lr_mult": 75, "scale_init": 14, "fixed_scale": False, "alpha": 0.20},
+    "S3_a025": {"scale_no_wd": True, "scale_lr_mult": 75, "scale_init": 14, "fixed_scale": False, "alpha": 0.25},
     "S3_a03":  {"scale_no_wd": True, "scale_lr_mult": 75, "scale_init": 14, "fixed_scale": False, "alpha": 0.30},
     "S3_a05":  {"scale_no_wd": True, "scale_lr_mult": 75, "scale_init": 14, "fixed_scale": False, "alpha": 0.50},
     "S3_a10":  {"scale_no_wd": True, "scale_lr_mult": 75, "scale_init": 14, "fixed_scale": False, "alpha": 1.00},
