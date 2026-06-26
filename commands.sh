@@ -1,3 +1,3 @@
-#1
+#2
 #install-env
-bash scripts/setup_env.sh
+-0
