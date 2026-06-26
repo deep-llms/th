@@ -43,7 +43,7 @@ ARM_CONFIGS = {
 }
 
 ALL_ARMS = list(ARM_CONFIGS.keys())
-DEFAULT_OUTPUT_BASE = "smoke_test_outputs"
+DEFAULT_OUTPUT_BASE = "/opt/dlami/nvme/smoke_test_outputs"
 
 
 def build_cmd(arm_name, arm_cfg, output_dir, data_dir, stop_at_step, save_token_ids=False):
@@ -53,7 +53,7 @@ def build_cmd(arm_name, arm_cfg, output_dir, data_dir, stop_at_step, save_token_
         "--tokenizer_name", "Qwen/Qwen3-0.6B",
         "--data_dir", data_dir,
         "--block_size", "2048",
-        "--preprocessing_num_workers", "30",
+        "--preprocessing_num_workers", "160",
         "--num_hub_embeddings", "1000",
         "--alpha", str(arm_cfg["alpha"]),
         "--scale_init", str(arm_cfg["scale_init"]),
@@ -62,8 +62,8 @@ def build_cmd(arm_name, arm_cfg, output_dir, data_dir, stop_at_step, save_token_
         "--seed", "42",
         "--bf16",
         "--ddp_timeout", "21600",
-        "--per_device_train_batch_size", "2",
-        "--gradient_accumulation_steps", "64",
+        "--per_device_train_batch_size", "16",
+        "--gradient_accumulation_steps", "4",
         "--num_train_epochs", "1",
         "--learning_rate", "3e-4",
         "--lr_scheduler_type", "cosine_with_min_lr",
@@ -126,7 +126,7 @@ def main():
     parser = argparse.ArgumentParser(description="Run smoke tests sequentially")
     parser.add_argument("--arms", nargs="+", default=ALL_ARMS, choices=ALL_ARMS)
     parser.add_argument("--output-base", default=DEFAULT_OUTPUT_BASE)
-    parser.add_argument("--data-dir", default="data/Qwen_Qwen3-0.6B/train")
+    parser.add_argument("--data-dir", default="/opt/dlami/nvme/embhub_data/Qwen_Qwen3-0.6B/train")
     parser.add_argument("--stop-at-step", type=int, default=1000)
     parser.add_argument("--save-token-ids", action="store_true",
                         help="Also dump training token IDs (for frequent-word analysis; decode offline)")
