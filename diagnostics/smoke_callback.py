@@ -54,7 +54,7 @@ class EmbHubSmokeCallback(TrainerCallback):
         self.csv_file = open(path, "a", newline="")
         self.csv_writer = csv.DictWriter(
             self.csv_file,
-            fieldnames=["step"] + METRIC_KEYS + ["train/loss"],
+            fieldnames=["step"] + METRIC_KEYS,
         )
         if not file_exists:
             self.csv_writer.writeheader()
@@ -88,9 +88,6 @@ class EmbHubSmokeCallback(TrainerCallback):
         if state.is_world_process_zero:
             self._ensure_csv(args.output_dir)
             row = {"step": state.global_step, **metrics}
-            if state.log_history:
-                last_log = state.log_history[-1]
-                row["train/loss"] = last_log.get("loss", "")
             self.csv_writer.writerow(row)
             self.csv_file.flush()
 

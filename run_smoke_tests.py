@@ -37,6 +37,7 @@ ARM_CONFIGS = {
     # S3 alpha variants (same as S3 but with different alpha)
     "S3_a01":  {"scale_no_wd": True, "scale_lr_mult": 75, "scale_init": 14, "fixed_scale": False, "alpha": 0.10},
     "S3_a02":  {"scale_no_wd": True, "scale_lr_mult": 75, "scale_init": 14, "fixed_scale": False, "alpha": 0.20},
+    "S3_a015": {"scale_no_wd": True, "scale_lr_mult": 75, "scale_init": 14, "fixed_scale": False, "alpha": 0.15},
     "S3_a025": {"scale_no_wd": True, "scale_lr_mult": 75, "scale_init": 14, "fixed_scale": False, "alpha": 0.25},
     "S3_a03":  {"scale_no_wd": True, "scale_lr_mult": 75, "scale_init": 14, "fixed_scale": False, "alpha": 0.30},
     "S3_a05":  {"scale_no_wd": True, "scale_lr_mult": 75, "scale_init": 14, "fixed_scale": False, "alpha": 0.50},
@@ -173,6 +174,7 @@ def main():
         env = os.environ.copy()
         env["NCCL_NVLS_ENABLE"] = "0"
         env["WANDB_PROJECT"] = "cross_lingual_embedding_hub"
+        env["WANDB_MODE"] = "offline"
 
         with open(log_path, "w") as log_file:
             proc = subprocess.Popen(
@@ -223,8 +225,7 @@ def main():
                 final_line = (f"step={last.get('step', '?')} "
                               f"scale={float(last.get('embhub/logit_scale', 0)):.2f} "
                               f"logit_std={float(last.get('embhub/logit_std', 0)):.4f} "
-                              f"entropy={float(last.get('embhub/entropy', 0)):.4f} "
-                              f"loss={last.get('train/loss', '?')}")
+                              f"entropy={float(last.get('embhub/entropy', 0)):.4f}")
 
         logger.info(f"\n  {arm} ({fixed_str}, alpha={cfg['alpha']}, init={cfg['scale_init']}, "
                      f"wd={'on' if not cfg['scale_no_wd'] else 'off'}, lr_mult={cfg['scale_lr_mult']}) "

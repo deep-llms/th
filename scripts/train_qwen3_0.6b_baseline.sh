@@ -13,6 +13,7 @@
 
 
 export WANDB_PROJECT="cross_lingual_embedding_hub"
+export WANDB_MODE=offline
 export NCCL_NVLS_ENABLE=0
 
 accelerate launch smoke_train.py \
