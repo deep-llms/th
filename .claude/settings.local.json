@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -n \"^class PreTrainedModel\" /home/thienbackup/miniconda3/envs/embeddings_hub/lib/python3.11/site-packages/transformers/modeling_utils.py)",
+      "Read(//home/thienbackup/miniconda3/envs/embeddings_hub/lib/python3.11/site-packages/transformers/**)",
+      "WebSearch",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(curl -sL https://raw.githubusercontent.com/huggingface/transformers/main/examples/pytorch/language-modeling/run_clm.py)",
+      "WebFetch(domain:arxiv.org)",
+      "WebFetch(domain:ar5iv.labs.arxiv.org)",
+      "WebFetch(domain:github.com)",
+      "Bash(grep -n \"def simple_evaluate\\\\|def evaluate\" /data/thuat_2/projects/lm-evaluation-harness/lm_eval/evaluator.py | head -5)",
+      "Read(//data/thuat_2/projects/lm-evaluation-harness/lm_eval/**)"
+    ]
+  },
+  "model": "claude-opus-4-6[1m]",
+  "effortLevel": "high"
+}

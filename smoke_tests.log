@@ -1,0 +1,19 @@
+14:40:04 - Running 1 smoke arms sequentially (8 GPUs each)
+14:40:04 - Arms: ['S3']
+14:40:04 - Stop at step: 6500
+14:40:04 - 
+14:40:04 -   START: S3 (learnable, alpha=0.05, init=14, wd=off, lr_mult=75)
+03:10:36 -     Reached step 6500 >= 6500, waiting 120s for checkpoint save...
+03:12:36 -     Sending SIGTERM...
+03:12:43 -   DONE:  S3 — STOPPED at step 6500  [131559s]
+03:12:43 -          See log: smoke_test_outputs/S3.log
+03:12:43 - 
+All 1 arms done in 131559s
+03:12:43 - 
+======================================================================
+03:12:43 - SMOKE TEST SUMMARY
+03:12:43 - ======================================================================
+03:12:43 - 
+  S3 (learnable, alpha=0.05, init=14, wd=off, lr_mult=75) [131559s]:
+03:12:43 -     step=6500 scale=54.60 logit_std=2.0624 entropy=2.0999 loss=3.246011734008789
+03:12:43 - 

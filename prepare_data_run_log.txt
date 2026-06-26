@@ -1,0 +1,180 @@
+LINUX_PACKAGES_LICENSES              Miniconda3-latest-Linux-x86_64.sh  PYTHON_PACKAGES_LICENSES                cross_lingual_embeddings_hub  miniconda3
+(embeddings_hub) ubuntu@ip-172-31-17-144:~$
+(embeddings_hub) ubuntu@ip-172-31-17-144:~$
+(embeddings_hub) ubuntu@ip-172-31-17-144:~$
+(embeddings_hub) ubuntu@ip-172-31-17-144:~$ cd cross_lingual_embeddings_hub/
+(embeddings_hub) ubuntu@ip-172-31-17-144:~/cross_lingual_embeddings_hub$
+(embeddings_hub) ubuntu@ip-172-31-17-144:~/cross_lingual_embeddings_hub$
+(embeddings_hub) ubuntu@ip-172-31-17-144:~/cross_lingual_embeddings_hub$
+(embeddings_hub) ubuntu@ip-172-31-17-144:~/cross_lingual_embeddings_hub$
+(embeddings_hub) ubuntu@ip-172-31-17-144:~/cross_lingual_embeddings_hub$ python prepare_data.py download sample --tokenizer-name Qwen/Qwen3-0.6B --num-workers      4
+[en] sampled 300/3072 files = 300 (target: 30.0B tokens)
+[vi] all files = 90 (target: 0.3B tokens)
+[zh] sampled 200/320 files = 200 (target: 0.3B tokens)
+[ru] sampled 200/1536 files = 200 (target: 0.3B tokens)
+[de] sampled 200/512 files = 200 (target: 0.3B tokens)
+[ar] all files = 128 (target: 0.3B tokens)
+
+Total files: 1118
+
+[en] Downloading 300 files...
+Fetching ... files: 300it [1:33:47, 18.76s/it]██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 737G/737G [1:33:20<00:00, 257MB/s]
+Download complete: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 737G/737G [1:33:50<00:00, 257MB/s]
+ Done: 300 parquet files in data/raw/en
+
+[vi] Downloading 90 files...
+Fetching ... files: 90it [18:32, 12.37s/it]
+Downloading (incomplete total...): 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 144G/144G [18:28<00:00, 126MB/s]
+ Done: 90 parquet files in data/raw/vi████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 144G/144G [18:35<00:00, 126MB/s]
+
+[zh] Downloading 200 files...
+Fetching ... files: 200it [51:40, 15.50s/it]
+
+ Done: 200 parquet files in data/raw/zh|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 401G/401G [51:42<00:00, 53.7MB/s]
+Download complete: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 401G/401G [51:43<00:00, 53.7MB/s]
+[ru] Downloading 200 files...
+Fetching ... files: 200it [43:08, 12.94s/it]
+
+ Done: 200 parquet files in data/raw/ru
+Downloading (incomplete total...): 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 337G/337G [42:48<00:00, 352MB/s]
+[de] Downloading 200 files...█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 337G/337G [43:11<00:00, 352MB/s]
+Download complete: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 737G/737G [3:27:25<00:00, 59.2MB/s]
+Download complete: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 144G/144G [1:53:34<00:00, 21.2MB/s]
+Download complete: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 401G/401G [1:34:57<00:00, 70.3MB/s]
+Download complete: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 337G/337G [43:13<00:00, 130MB/s]
+Fetching ... files: 200it [48:25, 14.53s/it]                                                                                                                            | 0.00/7.61G [00:00<?, ?B/s]
+
+ Done: 200 parquet files in data/raw/de
+
+[ar] Downloading 128 files......): 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 380G/380G [48:17<00:00, 147MB/s]
+Fetching ... files: 128it [26:27, 12.40s/it]██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 205G/205G [26:27<00:00, 102MB/s]
+Download complete: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 205G/205G [26:30<00:00, 102MB/s]
+ Done: 128 parquet files in data/raw/ar
+
+All downloads complete.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+config.json: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 726/726 [00:00<00:00, 5.82MB/s]
+tokenizer_config.json: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 9.73k/9.73k [00:00<00:00, 40.5MB/s]
+vocab.json: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 2.78M/2.78M [00:00<00:00, 87.8MB/s]
+merges.txt: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1.67M/1.67M [00:00<00:00, 148MB/s]
+tokenizer.json: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 11.4M/11.4M [00:02<00:00, 5.25MB/s]
+Download complete: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 380G/380G [1:15:03<00:00, 84.4MB/s]
+Download complete: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 205G/205G [26:34<00:00, 128MB/s]
+
+[en] Sampling from 300 files (train: 30.0B, eval: 10M tokens)...
+  [1/300] en_part_02039.parquet → 883,499,493 tokens so far (train)
+  [2/300] en_part_02512.parquet → 1,710,392,255 tokens so far (train)
+  [3/300] en_part_02078.parquet → 2,534,062,314 tokens so far (train)
+  [4/300] en_part_01715.parquet → 3,418,889,214 tokens so far (train)
+  [5/300] en_part_02900.parquet → 4,245,135,061 tokens so far (train)
+  [6/300] en_part_00030.parquet → 5,121,745,597 tokens so far (train)
+  [7/300] en_part_00551.parquet → 5,996,528,076 tokens so far (train)
+  [8/300] en_part_01273.parquet → 6,878,567,930 tokens so far (train)
+  [9/300] en_part_01854.parquet → 7,762,438,028 tokens so far (train)
+  [10/300] en_part_01704.parquet → 8,649,209,108 tokens so far (train)
+  [11/300] en_part_00188.parquet → 9,524,901,941 tokens so far (train)
+  [12/300] en_part_00122.parquet → 10,398,368,135 tokens so far (train)
+  [13/300] en_part_00116.parquet → 11,271,990,398 tokens so far (train)
+  [14/300] en_part_01104.parquet → 12,155,413,752 tokens so far (train)
+  [15/300] en_part_00576.parquet → 13,029,090,417 tokens so far (train)
+  [16/300] en_part_02451.parquet → 13,854,328,049 tokens so far (train)
+  [17/300] en_part_01201.parquet → 14,738,129,443 tokens so far (train)
+  [18/300] en_part_00827.parquet → 15,614,276,419 tokens so far (train)
+  [19/300] en_part_01901.parquet → 16,499,922,311 tokens so far (train)
+  [20/300] en_part_00172.parquet → 17,376,801,182 tokens so far (train)
+  [21/300] en_part_01430.parquet → 18,264,447,090 tokens so far (train)
+  [22/300] en_part_00914.parquet → 19,141,400,138 tokens so far (train)
+  [23/300] en_part_02922.parquet → 19,965,497,245 tokens so far (train)
+  [24/300] en_part_00810.parquet → 20,842,534,039 tokens so far (train)
+  [25/300] en_part_02186.parquet → 21,668,788,130 tokens so far (train)
+  [26/300] en_part_00504.parquet → 22,542,111,999 tokens so far (train)
+  [27/300] en_part_01118.parquet → 23,424,408,031 tokens so far (train)
+  [28/300] en_part_02933.parquet → 24,251,166,159 tokens so far (train)
+  [29/300] en_part_00474.parquet → 25,125,752,040 tokens so far (train)
+  [30/300] en_part_01826.parquet → 26,010,040,272 tokens so far (train)
+  [31/300] en_part_02415.parquet → 26,838,316,789 tokens so far (train)
+  [32/300] en_part_01992.parquet → 27,724,539,511 tokens so far (train)
+  [33/300] en_part_01071.parquet → 28,606,548,459 tokens so far (train)
+  [34/300] en_part_02873.parquet → 29,432,097,270 tokens so far (train)
+  [35/300] en_part_02688.parquet → 30,010,000,343 tokens so far (eval)
+  Train: 36,751,248 documents
+  Eval:  11,963 documents
+  Saving train set to data/Qwen_Qwen3-0.6B/train/en...
+Saving the dataset (270/270 shards): 100%|███████████████████████████████████████████████████████████████████████████████████████████████████| 36751248/36751248 [00:42<00:00, 867444.41 examples/s]
+  Saving eval set to data/Qwen_Qwen3-0.6B/eval/en...
+Saving the dataset (1/1 shards): 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████| 11963/11963 [00:00<00:00, 813193.18 examples/s]
+  Done: en
+
+[vi] Sampling from 90 files (train: 0.3B, eval: 10M tokens)...
+  [1/90] vi_part_00076.parquet → 310,000,253 tokens so far (eval)
+  Train: 277,566 documents
+  Eval:  9,327 documents
+  Saving train set to data/Qwen_Qwen3-0.6B/train/vi...
+Saving the dataset (3/3 shards): 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████| 277566/277566 [00:00<00:00, 671679.29 examples/s]
+  Saving eval set to data/Qwen_Qwen3-0.6B/eval/vi...
+Saving the dataset (1/1 shards): 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████| 9327/9327 [00:00<00:00, 661843.97 examples/s]
+  Done: vi
+
+[zh] Sampling from 200 files (train: 0.3B, eval: 10M tokens)...
+[transformers] Token indices sequence length is longer than the specified maximum sequence length for this model (139885 > 131072). Running this sequence through the model will result in indexing e
+rrors
+  [1/200] zh_part_00296.parquet → 310,000,834 tokens so far (eval)
+  Train: 290,375 documents
+  Eval:  9,640 documents
+  Saving train set to data/Qwen_Qwen3-0.6B/train/zh...
+Saving the dataset (3/3 shards): 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████| 290375/290375 [00:00<00:00, 847731.21 examples/s]
+  Saving eval set to data/Qwen_Qwen3-0.6B/eval/zh...
+Saving the dataset (1/1 shards): 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████| 9640/9640 [00:00<00:00, 492755.96 examples/s]
+  Done: zh
+
+[ru] Sampling from 200 files (train: 0.3B, eval: 10M tokens)...
+  [1/200] ru_part_01043.parquet → 310,014,472 tokens so far (eval)
+  Train: 239,685 documents
+  Eval:  8,098 documents
+  Saving train set to data/Qwen_Qwen3-0.6B/train/ru...
+Saving the dataset (4/4 shards): 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████| 239685/239685 [00:00<00:00, 444954.21 examples/s]
+  Saving eval set to data/Qwen_Qwen3-0.6B/eval/ru...
+Saving the dataset (1/1 shards): 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████| 8098/8098 [00:00<00:00, 494309.28 examples/s]
+  Done: ru
+
+[de] Sampling from 200 files (train: 0.3B, eval: 10M tokens)...
+  [1/200] de_part_00281.parquet → 310,000,177 tokens so far (eval)
+  Train: 290,740 documents
+  Eval:  9,827 documents
+  Saving train set to data/Qwen_Qwen3-0.6B/train/de...
+Saving the dataset (3/3 shards): 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████| 290740/290740 [00:00<00:00, 968975.62 examples/s]
+  Saving eval set to data/Qwen_Qwen3-0.6B/eval/de...
+Saving the dataset (1/1 shards): 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████| 9827/9827 [00:00<00:00, 781017.65 examples/s]
+  Done: de
+
+[ar] Sampling from 128 files (train: 0.3B, eval: 10M tokens)...
+  [1/128] ar_part_00074.parquet → 310,000,871 tokens so far (eval)
+  Train: 254,441 documents
+  Eval:  8,690 documents
+  Saving train set to data/Qwen_Qwen3-0.6B/train/ar...
+Saving the dataset (3/3 shards): 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████| 254441/254441 [00:00<00:00, 637368.94 examples/s]
+  Saving eval set to data/Qwen_Qwen3-0.6B/eval/ar...
+Saving the dataset (1/1 shards): 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████| 8690/8690 [00:00<00:00, 600944.76 examples/s]
+  Done: ar
+
+All sampling complete.
+  Train: data/Qwen_Qwen3-0.6B/train
+  Eval:  data/Qwen_Qwen3-0.6B/eval
+(embeddings_hub) ubuntu@ip-172-31-17-144:~/cross_lingual_embeddings_hub$
+(embeddings_hub) ubuntu@ip-172-31-17-144:~/cross_lingual_embeddings_hub$
+(embeddings_hub) ubuntu@ip-172-31-17-144:~/cross_lingual_embeddings_hub$
+(embeddings_hub) ubuntu@ip-172-31-17-144:~/cross_lingual_embeddings_hub$
+(embeddings_hub) ubuntu@ip-172-31-17-144:~/cross_lingual_embeddings_hub$
+(embeddings_hub) ubuntu@ip-172-31-17-144:~/cross_lingual_embeddings_hub$
+(embeddings_hub) ubuntu@ip-172-31-17-144:~/cross_lingual_embeddings_hub$
+(embeddings_hub) ubuntu@ip-172-31-17-144:~/cross_lingual_embeddings_hub$
+(embeddings_hub) ubuntu@ip-172-31-17-144:~/cross_lingual_embeddings_hub$
+(embeddings_hub) ubuntu@ip-172-31-17-144:~/cross_lingual_embeddings_hub$
+(embeddings_hub) ubuntu@ip-172-31-17-144:~/cross_lingual_embeddings_hub$
+(embeddings_hub) ubuntu@ip-172-31-17-144:~/cross_lingual_embeddings_hub$
+(embeddings_hub) ubuntu@ip-172-31-17-144:~/cross_lingual_embeddings_hub$ tmux capture-pane -S -110 -p > prepare_data_run_log.txt
+(embeddings_hub) ubuntu@ip-172-31-17-144:~/cross_lingual_embeddings_hub$ tmux capture-pane -S -111 -p > prepare_data_run_log.txt
+(embeddings_hub) ubuntu@ip-172-31-17-144:~/cross_lingual_embeddings_hub$
+(embeddings_hub) ubuntu@ip-172-31-17-144:~/cross_lingual_embeddings_hub$
+(embeddings_hub) ubuntu@ip-172-31-17-144:~/cross_lingual_embeddings_hub$ tmux capture-pane -S -115 -p > prepare_data_run_log.txt
+
