@@ -202,6 +202,10 @@ def main():
             "last_step": last_step,
         })
 
+        if arm_name != args.arms[-1]:
+            logger.info(f"    Sleeping 30s before next arm...")
+            time.sleep(30)
+
     total_elapsed = time.time() - start_time
     logger.info(f"\nAll {len(completed)} arms done in {total_elapsed:.0f}s")
 
