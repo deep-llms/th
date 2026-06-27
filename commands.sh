@@ -1,4 +1,2 @@
-#1
+#2
 #check-wandb-size
-ls ~/th/wandb
-du -sh ~/th/wandb
