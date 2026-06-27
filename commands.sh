@@ -1,3 +1,2 @@
-#1
+#2
 #train-alpha-variants 
-nvidia-smi
