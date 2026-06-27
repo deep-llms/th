@@ -1,3 +1,6 @@
-#2 -f-/opt/dlami/nvme/smoke_test_outputs/S3_a02/probe2_single_step1500_RESULTS.md
-#probe-alpha-variants
-       
+#1
+#check-wandb-size
+du -sh /opt/dlami/nvme/smoke_test_outputs/S3_a015/wandb/
+du -sh /opt/dlami/nvme/smoke_test_outputs/S3_a02/wandb/
+ls /opt/dlami/nvme/smoke_test_outputs/S3_a015/wandb/
+ls /opt/dlami/nvme/smoke_test_outputs/S3_a02/wandb/
