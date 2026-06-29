@@ -1,2 +1,2 @@
-#2
+#2 +a -f-/opt/dlami/nvme/smoke_test_outputs/baseline/probe2_single_step1500_RESULTS.md,/opt/dlami/nvme/smoke_test_outputs/baseline/probe2_single_step3250_RESULTS.md,/opt/dlami/nvme/smoke_test_outputs/baseline/probe2_single_step5500_RESULTS.md,/opt/dlami/nvme/smoke_test_outputs/baseline/probe2_single_step6500_RESULTS.md,/opt/dlami/nvme/smoke_test_outputs/baseline/checkpoint-6500/trainer_state.json
 #probe-baseline
