@@ -1,3 +1,2 @@
-#2 +a
-#eval-all-1
-    
+#2 +a -f-/opt/dlami/nvme/smoke_test_outputs/baseline/checkpoint-1500/eval_ppl.json,/opt/dlami/nvme/smoke_test_outputs/baseline/checkpoint-3250/eval_ppl.json,/opt/dlami/nvme/smoke_test_outputs/baseline/checkpoint-5500/eval_ppl.json,/opt/dlami/nvme/smoke_test_outputs/baseline/checkpoint-6500/eval_ppl.json,/opt/dlami/nvme/smoke_test_outputs/S3_a015/checkpoint-1500/eval_ppl.json,/opt/dlami/nvme/smoke_test_outputs/S3_a015/checkpoint-3250/eval_ppl.json,/opt/dlami/nvme/smoke_test_outputs/S3_a015/checkpoint-5500/eval_ppl.json,/opt/dlami/nvme/smoke_test_outputs/S3_a015/checkpoint-6500/eval_ppl.json,/opt/dlami/nvme/smoke_test_outputs/S3_a02/checkpoint-1500/eval_ppl.json,/opt/dlami/nvme/smoke_test_outputs/S3_a02/checkpoint-3250/eval_ppl.json
+#eval-results-1
