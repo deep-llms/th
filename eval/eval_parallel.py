@@ -22,20 +22,12 @@ from collections import deque
 logger = logging.getLogger(__name__)
 
 
-DEFAULT_BASELINE_DIR = "/opt/dlami/nvme/checkpoints/qwen3-0.6b-scratch-baseline"
-DEFAULT_EMBHUB_DIR = "/opt/dlami/nvme/checkpoints/qwen3-0.6b-scratch-hub1000-a0.05"
+DEFAULT_OUTPUT_BASE = "/opt/dlami/nvme/smoke_test_outputs"
 
 DEFAULT_CHECKPOINTS = [
-    f"{DEFAULT_BASELINE_DIR}/checkpoint-5000",
-    f"{DEFAULT_BASELINE_DIR}/checkpoint-10000",
-    f"{DEFAULT_BASELINE_DIR}/checkpoint-20000",
-    f"{DEFAULT_BASELINE_DIR}/checkpoint-30000",
-    f"{DEFAULT_BASELINE_DIR}",
-    f"{DEFAULT_EMBHUB_DIR}/checkpoint-5000",
-    f"{DEFAULT_EMBHUB_DIR}/checkpoint-10000",
-    f"{DEFAULT_EMBHUB_DIR}/checkpoint-20000",
-    f"{DEFAULT_EMBHUB_DIR}/checkpoint-30000",
-    f"{DEFAULT_EMBHUB_DIR}",
+    f"{DEFAULT_OUTPUT_BASE}/baseline/checkpoint-6500",
+    f"{DEFAULT_OUTPUT_BASE}/S3_a015/checkpoint-6500",
+    f"{DEFAULT_OUTPUT_BASE}/S3_a02/checkpoint-6500",
 ]
 
 
@@ -68,7 +60,7 @@ def main():
     parser = argparse.ArgumentParser(description="Parallel evaluation across GPUs")
     parser.add_argument("--checkpoints", nargs="+", default=None,
                         help="Checkpoint paths (default: baseline + embhub milestones)")
-    parser.add_argument("--eval-dir", default="data/Qwen_Qwen3-0.6B/eval",
+    parser.add_argument("--eval-dir", default="/opt/dlami/nvme/embhub_data/Qwen_Qwen3-0.6B/eval",
                         help="Eval data directory")
     parser.add_argument("--bf16", action="store_true", help="Use bfloat16")
     parser.add_argument("--ppl-only", action="store_true", help="Only run perplexity")
