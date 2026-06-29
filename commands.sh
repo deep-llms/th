@@ -1,5 +1,2 @@
-#1
+#2
 #probe-baseline
-screen ls
-echo "--------"
-nvidia-smi
