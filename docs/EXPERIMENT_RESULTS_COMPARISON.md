@@ -26,7 +26,7 @@ All three models have nearly identical loss throughout training. EmbHub does not
 | Top-10 Anchor Mass | 0.219 | 0.196 |
 | Dead Anchor Frac | 0.000 | 0.000 |
 | Anchor Pairwise Cos | 0.031 | 0.029 |
-| Norm Ratio | 0.040 | 0.051 |
+| Norm Ratio | 0.039 | 0.051 |
 
 ### Step 3250
 
@@ -109,21 +109,22 @@ Measures cosine similarity of translation pairs vs random pairs at the embedding
 
 All models develop cross-lingual structure in raw embeddings. Baseline has slightly larger gap, suggesting EmbHub models offload some cross-lingual signal to the hub instead of the base embeddings.
 
-### At alpha=0.30 (with hub contribution, S3 variants only)
+### Effect of adding hub contribution (all test alphas, step 6500)
 
-| Step | S3 α=0.15 Trans | S3 α=0.15 Rand | S3 α=0.15 Gap | S3 α=0.20 Trans | S3 α=0.20 Rand | S3 α=0.20 Gap |
-|------|-----------------|----------------|---------------|-----------------|----------------|---------------|
-| 1500 | 0.2270 | 0.2162 | +0.0108 | 0.2255 | 0.2138 | +0.0117 |
-| 3250 | 0.2750 | 0.2487 | +0.0263 | 0.2721 | 0.2452 | +0.0269 |
-| 5500 | 0.2865 | 0.2475 | +0.0390 | 0.2833 | 0.2431 | +0.0402 |
-| 6500 | 0.2887 | 0.2457 | +0.0430 | 0.2857 | 0.2415 | +0.0442 |
+| Test α | S3 α=0.15 Gap | S3 α=0.20 Gap |
+|--------|---------------|---------------|
+| 0.00 | +0.0457 | +0.0462 |
+| 0.05 | +0.0454 | +0.0460 |
+| 0.10 | +0.0450 | +0.0457 |
+| 0.20 | +0.0441 | +0.0451 |
+| 0.30 | +0.0430 | +0.0442 |
 
-Adding hub contribution (alpha=0.30) does not significantly improve the gap over raw embeddings. The hub is not yet providing substantial additional cross-lingual alignment at 6500 steps.
+For both models, the gap is highest at α=0.0 (raw embeddings) and decreases as hub contribution is added. The hub contribution pushes both translation and random pairs in a similar direction, slightly reducing the cross-lingual gap rather than amplifying it. Baseline gap at α=0.0 is +0.0504 for reference.
 
 ## 5. Summary
 
 1. **Loss**: All three models are equivalent. EmbHub adds no perplexity cost.
 2. **Anchor overlap (Test A)**: α=0.20 > α=0.15. Higher alpha produces more statistically significant cross-lingual anchor sharing (p=1.03e-03 at step 6500).
-3. **Embedding similarity (Test B)**: Baseline slightly beats both EmbHub variants on raw embedding cosine gap. This suggests EmbHub redistributes cross-lingual signal between base embeddings and the hub, rather than adding to it.
+3. **Embedding similarity (Test B)**: Baseline slightly beats both EmbHub variants on raw embedding cosine gap (+0.0504 vs ~0.046). The anchors do learn cross-lingual structure (Test A shows significant sharing), but adding hub contribution increases similarity for both translation and random pairs, so the gap does not widen at the embedding level. The effect may appear downstream after transformer layers process the hub-modified embeddings.
 4. **EmbHub health**: α=0.20 keeps anchors healthier (0% dead) while α=0.15 develops ~1.6% dead anchors. α=0.20 has higher entropy (more diverse anchor usage).
 5. **At 6500 steps** (early training), the hub contribution is small (norm_ratio ~8-9%). The cross-lingual benefits of EmbHub may become more apparent later in training as the hub grows stronger.

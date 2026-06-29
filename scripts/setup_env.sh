@@ -68,7 +68,24 @@ conda run -n fasttext_env pip install "$FASTTEXT_DIR"
 conda run -n fasttext_env pip install "numpy<2"
 rm -rf "$FASTTEXT_DIR"
 
-# 8. Verify
+# 8. Create eval env
+if conda env list | grep -q "eval"; then
+    echo "=== eval env already exists ==="
+else
+    echo "=== Creating eval env ==="
+    conda create -n eval python=3.11 -y
+fi
+
+# 9. Install lm-eval-harness from source
+echo "=== Installing lm-eval-harness in eval env ==="
+LM_EVAL_DIR="/tmp/lm_eval_build"
+if [ ! -d "$LM_EVAL_DIR" ]; then
+    git clone https://github.com/EleutherAI/lm-evaluation-harness.git "$LM_EVAL_DIR"
+fi
+conda run -n eval pip install "$LM_EVAL_DIR[hf,vllm,api]"
+rm -rf "$LM_EVAL_DIR"
+
+# 10. Verify
 echo ""
 echo "=== Verifying embeddings_hub ==="
 sleep 5
