@@ -1,3 +1,2 @@
-#1 +5+a
-#probe-s3a02-baseline-long
-nvidia-smi
+#2 +a -f-/opt/dlami/nvme/smoke_test_outputs/S3_a02/probe2_single_step1500_RESULTS.md,/opt/dlami/nvme/smoke_test_outputs/S3_a02/probe2_single_step3250_RESULTS.md,/opt/dlami/nvme/smoke_test_outputs/S3_a02/probe2_single_step5500_RESULTS.md,/opt/dlami/nvme/smoke_test_outputs/S3_a02/probe2_single_step6500_RESULTS.md,/opt/dlami/nvme/smoke_test_outputs/S3_a02/probe2_single_step10000_RESULTS.md,/opt/dlami/nvme/smoke_test_outputs/S3_a02/probe2_single_step12500_RESULTS.md,/opt/dlami/nvme/smoke_test_outputs/S3_a02/probe2_single_step15000_RESULTS.md,/opt/dlami/nvme/smoke_test_outputs/S3_a02/probe2_single_step17500_RESULTS.md,/opt/dlami/nvme/smoke_test_outputs/S3_a02/probe2_single_step20000_RESULTS.md,/opt/dlami/nvme/smoke_test_outputs/S3_a02/probe2_single_step22500_RESULTS.md
+#probe-results-s3a02-1
