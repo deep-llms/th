@@ -120,15 +120,18 @@ class EmbHubV3(nn.Module):
                 weights = logits.softmax(dim=-1)
                 mixture = weights @ self.anchor_values.float()
             else:
-                saved_keys = self.anchor_keys.data
-                saved_values = self.anchor_values.data
-                try:
-                    self.anchor_keys.data = saved_keys.float()
-                    self.anchor_values.data = saved_values.float()
-                    mixture, weights, logits = self._select_multi_head(x_f)
-                finally:
-                    self.anchor_keys.data = saved_keys
-                    self.anchor_values.data = saved_values
+                B_seq = x_f.shape[:-1]
+                h, d_h = self.num_heads, self.head_dim
+                N = self.num_embeddings
+                x_heads = x_f.view(*B_seq, h, d_h)
+                keys_f = self.anchor_keys.float().view(N, h, d_h)
+                values_f = self.anchor_values.float().view(N, h, d_h)
+                q = F.normalize(x_heads, dim=-1)
+                k = F.normalize(keys_f, dim=-1)
+                logits = torch.einsum("...hd,nhd->...hn", q, k) * scale
+                weights = logits.softmax(dim=-1)
+                mixture_heads = torch.einsum("...hn,nhd->...hd", weights, values_f)
+                mixture = mixture_heads.reshape(*B_seq, self.embedding_dim)
 
             update = F.linear(mixture, self.linear_v.weight.float())
             gate = torch.sigmoid(F.linear(x_f, self.linear_g.weight.float(), self.linear_g.bias.float()))
