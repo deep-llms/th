@@ -213,6 +213,8 @@ class TestDiagnostics:
         x = torch.randn(2, 10, 64, dtype=torch.bfloat16)
         diag = hub.compute_diagnostics(x)
         assert isinstance(diag["norm_ratio"], float)
+        assert hub.mlp[0].weight.dtype == torch.bfloat16, \
+            "compute_diagnostics must not mutate MLP dtype"
 
 
 # ---------------------------------------------------------------------------

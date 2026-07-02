@@ -95,8 +95,9 @@ class EmbHubV2Concat(nn.Module):
             mixture = weights @ self.hub_embeddings.float()
 
             if self.use_mlp:
-                mlp_f = self.mlp.float() if hasattr(self.mlp, 'float') else self.mlp
-                mixture_transformed = mlp_f(mixture)
+                mixture_transformed = F.gelu(
+                    F.linear(mixture, self.mlp[0].weight.float(), self.mlp[0].bias.float())
+                )
             else:
                 mixture_transformed = mixture
 
