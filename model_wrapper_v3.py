@@ -4,6 +4,8 @@ Supports hub types:
 - "v3": gate + add with decoupled keys/values (V3/V4/V5)
 - "v2_concat": concat + linear (V2/V2b)
 - "v2_topk": top-k anchor concat (V2c/V2c+tail/V2c+buckets)
+- "v6": stochastic replacement (V6-mix)
+- "v6f": V6 + scarcity + norm-capped residual (V6f factorized)
 
 Supports placement at:
 - "embedding": after the token embedding layer
@@ -35,6 +37,7 @@ from transformers import AutoModelForCausalLM, AutoConfig
 from hub_layer_v3 import EmbHubV3
 from hub_layer_v2_concat import EmbHubV2Concat
 from hub_layer_v2_topk import EmbHubV2TopK
+from hub_layer_v6 import EmbHubV6
 
 EMBHUB_V3_WEIGHTS_NAME = "embhub_v3.pt"
 EMBHUB_V3_CONFIG_NAME = "embhub_v3_config.json"
@@ -63,6 +66,10 @@ def inject_embhub_v3(
     weighting: str = "raw_softmax",
     tail_mode: str = "none",
     num_buckets: int = 10,
+    r_budget: float = 0.3,
+    p_only: float = 0.10,
+    p_both: float = 0.40,
+    anneal_steps: int = 2000,
     placement: str = "embedding",
     layer_idx: int = 10,
     freeze_base: bool = False,
@@ -110,8 +117,20 @@ def inject_embhub_v3(
             num_buckets=num_buckets,
             reference_weight=reference_weight,
         )
+    elif hub_type in ("v6", "v6f"):
+        hub = EmbHubV6(
+            embedding_dim=embedding_dim,
+            num_embeddings=num_embeddings,
+            top_k=top_k,
+            use_residual_cap=(hub_type == "v6f"),
+            r_budget=r_budget,
+            p_only=p_only,
+            p_both=p_both,
+            anneal_steps=anneal_steps,
+            reference_weight=reference_weight,
+        )
     else:
-        raise ValueError(f"hub_type must be 'v3', 'v2_concat', or 'v2_topk', got '{hub_type}'")
+        raise ValueError(f"hub_type must be 'v3', 'v2_concat', 'v2_topk', 'v6', or 'v6f', got '{hub_type}'")
     hub.to(device=next(model.parameters()).device, dtype=next(model.parameters()).dtype)
 
     model.embhub = hub
@@ -180,6 +199,13 @@ def save_embhub_v3(model: nn.Module, save_directory: str) -> None:
         config["weighting"] = hub.weighting
         config["tail_mode"] = hub.tail_mode
         config["num_buckets"] = hub.num_buckets
+    elif hub_type in ("v6", "v6f"):
+        config["top_k"] = hub.top_k
+        config["use_residual_cap"] = hub.use_residual_cap
+        config["r_budget"] = hub.r_budget
+        config["p_only"] = hub.p_only
+        config["p_both"] = hub.p_both
+        config["anneal_steps"] = hub.anneal_steps
     with open(os.path.join(save_directory, EMBHUB_V3_CONFIG_NAME), "w") as f:
         json.dump(config, f, indent=2)
 
@@ -195,6 +221,10 @@ def load_model_with_embhub_v3(
     weighting: str = "raw_softmax",
     tail_mode: str = "none",
     num_buckets: int = 10,
+    r_budget: float = 0.3,
+    p_only: float = 0.10,
+    p_both: float = 0.40,
+    anneal_steps: int = 2000,
     placement: str = "embedding",
     layer_idx: int = 10,
     freeze_base: bool = False,
@@ -219,6 +249,10 @@ def load_model_with_embhub_v3(
             weighting=hub_config.get("weighting", "raw_softmax"),
             tail_mode=hub_config.get("tail_mode", "none"),
             num_buckets=hub_config.get("num_buckets", 10),
+            r_budget=hub_config.get("r_budget", 0.3),
+            p_only=hub_config.get("p_only", 0.10),
+            p_both=hub_config.get("p_both", 0.40),
+            anneal_steps=hub_config.get("anneal_steps", 2000),
             placement=hub_config.get("placement", "embedding"),
             layer_idx=hub_config.get("layer_idx", 10),
             freeze_base=freeze_base,
@@ -236,6 +270,10 @@ def load_model_with_embhub_v3(
             weighting=weighting,
             tail_mode=tail_mode,
             num_buckets=num_buckets,
+            r_budget=r_budget,
+            p_only=p_only,
+            p_both=p_both,
+            anneal_steps=anneal_steps,
             placement=placement,
             layer_idx=layer_idx,
             freeze_base=freeze_base,
