@@ -216,6 +216,25 @@ class TestDiagnostics:
         diag = hub.compute_diagnostics(torch.randn(2, 10, 64))
         assert 0 < diag["topk_mass_total"] <= 1.0
 
+    def test_diagnostics_bf16(self):
+        hub = EmbHubV2TopK(embedding_dim=64, num_embeddings=32, top_k=5).to(torch.bfloat16)
+        x = torch.randn(2, 10, 64, dtype=torch.bfloat16)
+        diag = hub.compute_diagnostics(x)
+        assert isinstance(diag["norm_ratio"], float)
+        assert not any(str(v) == 'nan' for v in diag.values())
+
+    def test_diagnostics_bf16_tail(self):
+        hub = EmbHubV2TopK(embedding_dim=64, num_embeddings=32, top_k=5, tail_mode="tail").to(torch.bfloat16)
+        x = torch.randn(2, 10, 64, dtype=torch.bfloat16)
+        diag = hub.compute_diagnostics(x)
+        assert isinstance(diag["norm_ratio"], float)
+
+    def test_diagnostics_bf16_buckets(self):
+        hub = EmbHubV2TopK(embedding_dim=64, num_embeddings=32, top_k=5, tail_mode="buckets", num_buckets=4).to(torch.bfloat16)
+        x = torch.randn(2, 10, 64, dtype=torch.bfloat16)
+        diag = hub.compute_diagnostics(x)
+        assert isinstance(diag["norm_ratio"], float)
+
 
 # ---------------------------------------------------------------------------
 # State dict tests
